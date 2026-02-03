@@ -1,0 +1,158 @@
+import { Link } from "react-router-dom";
+import Layout from "@/components/layout/Layout";
+import { useCart, CartItem } from "@/hooks/useCart";
+import { Button } from "@/components/ui/button";
+import { Minus, Plus, Trash2, ArrowLeft, ShoppingBag } from "lucide-react";
+
+const formatPrice = (price: number) => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(price);
+};
+
+const CartItemRow = ({ item }: { item: CartItem }) => {
+  const { updateQuantity, removeFromCart } = useCart();
+
+  return (
+    <div className="flex items-start gap-4 py-6 border-b border-border">
+      {/* Product Image */}
+      <div className="w-24 h-24 bg-secondary flex-shrink-0">
+        {item.image ? (
+          <img
+            src={item.image}
+            alt={item.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
+            No image
+          </div>
+        )}
+      </div>
+
+      {/* Product Details */}
+      <div className="flex-1 min-w-0">
+        <h3 className="font-sans font-medium">{item.name}</h3>
+        <p className="text-muted-foreground mt-1">{formatPrice(item.price)}</p>
+
+        {/* Quantity Controls */}
+        <div className="flex items-center gap-3 mt-3">
+          <button
+            onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+            className="w-8 h-8 flex items-center justify-center border border-border rounded hover:bg-secondary"
+          >
+            <Minus className="w-4 h-4" />
+          </button>
+          <span className="font-sans w-8 text-center">{item.quantity}</span>
+          <button
+            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+            className="w-8 h-8 flex items-center justify-center border border-border rounded hover:bg-secondary"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => removeFromCart(item.id)}
+            className="ml-4 text-muted-foreground hover:text-destructive"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Item Total */}
+      <div className="text-right">
+        <p className="font-sans font-medium">
+          {formatPrice(item.price * item.quantity)}
+        </p>
+      </div>
+    </div>
+  );
+};
+
+const Cart = () => {
+  const { items, getTotalPrice, clearCart } = useCart();
+
+  if (items.length === 0) {
+    return (
+      <Layout>
+        <div className="container-editorial py-16">
+          <h1 className="text-4xl md:text-5xl font-serif mb-8">Cart</h1>
+          <div className="text-center py-16">
+            <ShoppingBag className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+            <p className="text-xl text-muted-foreground mb-6">Your cart is empty</p>
+            <Link to="/store">
+              <Button>Continue Shopping</Button>
+            </Link>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout>
+      <div className="container-wide py-16">
+        <Link 
+          to="/store" 
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Continue Shopping
+        </Link>
+
+        <h1 className="text-4xl md:text-5xl font-serif mb-8">Cart</h1>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          {/* Cart Items */}
+          <div className="lg:col-span-2">
+            <div className="divide-y divide-border">
+              {items.map((item) => (
+                <CartItemRow key={item.id} item={item} />
+              ))}
+            </div>
+            <button
+              onClick={clearCart}
+              className="text-sm text-muted-foreground hover:text-foreground mt-4"
+            >
+              Clear cart
+            </button>
+          </div>
+
+          {/* Order Summary */}
+          <div className="lg:col-span-1">
+            <div className="bg-secondary p-6 sticky top-24">
+              <h2 className="font-sans font-medium text-lg mb-4">Order Summary</h2>
+              
+              <div className="space-y-2 text-sm border-b border-border pb-4 mb-4">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span>{formatPrice(getTotalPrice())}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Shipping</span>
+                  <span className="text-muted-foreground">Calculated at checkout</span>
+                </div>
+              </div>
+
+              <div className="flex justify-between font-medium mb-6">
+                <span>Total</span>
+                <span>{formatPrice(getTotalPrice())}</span>
+              </div>
+
+              <Button className="w-full" size="lg">
+                Proceed to Checkout
+              </Button>
+
+              <p className="text-xs text-muted-foreground text-center mt-4">
+                Shipping and taxes calculated at checkout
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export default Cart;
