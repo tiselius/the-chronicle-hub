@@ -16,7 +16,7 @@ const formatPrice = (price: number) => {
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { addToCart } = useCart();
+  const { addToCart, isInCart } = useCart();
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ["product", slug],
@@ -26,8 +26,10 @@ const ProductDetail = () => {
     },
   });
 
+  const inCart = product ? isInCart(product._id) : false;
+
   const handleAddToCart = () => {
-    if (product) {
+    if (product && !inCart) {
       addToCart({
         id: product._id,
         name: product.name,
@@ -116,6 +118,10 @@ const ProductDetail = () => {
               {product.inStock === false ? (
                 <Button disabled variant="secondary" className="w-full md:w-auto">
                   Out of Stock
+                </Button>
+              ) : inCart ? (
+                <Button disabled variant="secondary" className="w-full md:w-auto">
+                  Redan i varukorgen
                 </Button>
               ) : (
                 <Button 
