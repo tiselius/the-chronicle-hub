@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { useCart, CartItem } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, Trash2, ArrowLeft, ShoppingBag } from "lucide-react";
+import { Trash2, ArrowLeft, ShoppingBag } from "lucide-react";
 
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat("en-US", {
@@ -12,7 +12,7 @@ const formatPrice = (price: number) => {
 };
 
 const CartItemRow = ({ item }: { item: CartItem }) => {
-  const { updateQuantity, removeFromCart } = useCart();
+  const { removeFromCart } = useCart();
 
   return (
     <div className="flex items-start gap-4 py-6 border-b border-border">
@@ -36,34 +36,20 @@ const CartItemRow = ({ item }: { item: CartItem }) => {
         <h3 className="font-sans font-medium">{item.name}</h3>
         <p className="text-muted-foreground mt-1">{formatPrice(item.price)}</p>
 
-        {/* Quantity Controls */}
-        <div className="flex items-center gap-3 mt-3">
-          <button
-            onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-            className="w-8 h-8 flex items-center justify-center border border-border rounded hover:bg-secondary"
-          >
-            <Minus className="w-4 h-4" />
-          </button>
-          <span className="font-sans w-8 text-center">{item.quantity}</span>
-          <button
-            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-            className="w-8 h-8 flex items-center justify-center border border-border rounded hover:bg-secondary"
-          >
-            <Plus className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => removeFromCart(item.id)}
-            className="ml-4 text-muted-foreground hover:text-destructive"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
+        {/* Remove Button */}
+        <button
+          onClick={() => removeFromCart(item.id)}
+          className="mt-3 text-sm text-muted-foreground hover:text-destructive flex items-center gap-1"
+        >
+          <Trash2 className="w-4 h-4" />
+          Ta bort
+        </button>
       </div>
 
       {/* Item Total */}
       <div className="text-right">
         <p className="font-sans font-medium">
-          {formatPrice(item.price * item.quantity)}
+          {formatPrice(item.price)}
         </p>
       </div>
     </div>

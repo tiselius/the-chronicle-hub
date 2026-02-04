@@ -70,7 +70,7 @@ const ArticleDetail = () => {
           <h1 className="text-4xl md:text-5xl font-serif mb-4">{article.title}</h1>
           <div className="flex items-center gap-4 text-muted-foreground">
             {article.author && (
-              <span className="font-sans">By {article.author.name}</span>
+              <span className="font-sans">Av {article.author}</span>
             )}
             <span>·</span>
             <time className="font-sans">{formattedDate}</time>
