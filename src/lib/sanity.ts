@@ -3,16 +3,16 @@ import { createClient } from "@sanity/client";
 // Create the Sanity client
 // You'll need to replace these with your actual Sanity project details
 export const sanityClient = createClient({
-  projectId: import.meta.env.VITE_SANITY_PROJECT_ID || "your-project-id",
-  dataset: import.meta.env.VITE_SANITY_DATASET || "production",
-  apiVersion: "2024-01-01",
-  useCdn: true,
+  projectId: import.meta.env.VITE_SANITY_PROJECT_ID ,
+  dataset: import.meta.env.VITE_SANITY_DATASET ,
+  apiVersion: "2026-02-03",
+  useCdn: false,
 });
 
 // Helper function to build image URLs
 export const urlFor = (source: SanityImageSource) => {
-  const projectId = import.meta.env.VITE_SANITY_PROJECT_ID || "your-project-id";
-  const dataset = import.meta.env.VITE_SANITY_DATASET || "production";
+  const projectId = import.meta.env.VITE_SANITY_PROJECT_ID; 
+  const dataset = import.meta.env.VITE_SANITY_DATASET; 
   
   if (!source?.asset?._ref) return "";
   
@@ -38,10 +38,7 @@ export interface Article {
   slug: { current: string };
   excerpt?: string;
   mainImage?: SanityImageSource;
-  author?: {
-    name: string;
-    image?: SanityImageSource;
-  };
+  author?: string;
   publishedAt: string;
   body?: unknown[];
 }
@@ -66,10 +63,7 @@ export const articlesQuery = `*[_type == "article"] | order(publishedAt desc) {
   slug,
   excerpt,
   mainImage,
-  author->{
-    name,
-    image
-  },
+  author,
   publishedAt
 }`;
 
@@ -80,10 +74,7 @@ export const articleBySlugQuery = `*[_type == "article" && slug.current == $slug
   slug,
   excerpt,
   mainImage,
-  author->{
-    name,
-    image
-  },
+  author,
   publishedAt,
   body
 }`;

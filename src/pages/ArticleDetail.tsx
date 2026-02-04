@@ -6,45 +6,14 @@ import { sanityClient, articleBySlugQuery, urlFor, Article } from "@/lib/sanity"
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft } from "lucide-react";
 
-// Mock article for development
-const mockArticle: Article = {
-  _id: "1",
-  _createdAt: "2024-01-15",
-  title: "The Art of Mindful Design",
-  slug: { current: "art-of-mindful-design" },
-  excerpt: "Exploring how intentional design choices create more meaningful user experiences.",
-  publishedAt: "2024-01-15",
-  author: { name: "Jane Mitchell" },
-  body: [
-    {
-      _type: "block",
-      children: [
-        { _type: "span", text: "In an era of constant digital noise, the practice of mindful design has become more essential than ever. It's not just about making things look beautiful—it's about creating experiences that respect our users' time, attention, and emotional well-being." }
-      ],
-      style: "normal"
-    },
-    {
-      _type: "block",
-      children: [
-        { _type: "span", text: "The principles of mindful design draw from ancient philosophies while addressing thoroughly modern challenges. When we approach our work with intention and care, we create not just products, but meaningful connections." }
-      ],
-      style: "normal"
-    }
-  ],
-};
-
 const ArticleDetail = () => {
   const { slug } = useParams<{ slug: string }>();
 
   const { data: article, isLoading, error } = useQuery({
     queryKey: ["article", slug],
     queryFn: async () => {
-      try {
         const result = await sanityClient.fetch<Article>(articleBySlugQuery, { slug });
-        return result || mockArticle;
-      } catch {
-        return mockArticle;
-      }
+        return result ;
     },
   });
 

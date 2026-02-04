@@ -8,9 +8,9 @@ const Header = () => {
   const totalItems = getTotalItems();
 
   const navLinks = [
-    { to: "/", label: "Articles" },
-    { to: "/store", label: "Store" },
-    { to: "/about", label: "About" },
+    { to: "/", label: "Artiklar" },
+    { to: "/store", label: "Bokaffären" },
+    { to: "/about", label: "Om sajten" },
   ];
 
   return (
@@ -22,7 +22,7 @@ const Header = () => {
             to="/" 
             className="font-serif text-2xl font-semibold tracking-tight hover:no-underline"
           >
-            Editorial
+            Böckerna
           </Link>
 
           {/* Navigation */}

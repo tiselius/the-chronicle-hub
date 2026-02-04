@@ -52,56 +52,15 @@ const ProductSkeleton = () => (
   </div>
 );
 
-// Mock data for development
-const mockProducts: Product[] = [
-  {
-    _id: "1",
-    _createdAt: "2024-01-15",
-    name: "Minimal Desk Lamp",
-    slug: { current: "minimal-desk-lamp" },
-    price: 145,
-    description: "A beautifully crafted desk lamp with clean lines and warm ambient lighting.",
-    inStock: true,
-  },
-  {
-    _id: "2",
-    _createdAt: "2024-01-10",
-    name: "Ceramic Vase",
-    slug: { current: "ceramic-vase" },
-    price: 78,
-    description: "Handmade ceramic vase with a subtle matte finish.",
-    inStock: true,
-  },
-  {
-    _id: "3",
-    _createdAt: "2024-01-05",
-    name: "Leather Notebook",
-    slug: { current: "leather-notebook" },
-    price: 42,
-    description: "Premium leather-bound notebook with archival quality paper.",
-    inStock: true,
-  },
-  {
-    _id: "4",
-    _createdAt: "2024-01-01",
-    name: "Wool Throw Blanket",
-    slug: { current: "wool-throw-blanket" },
-    price: 195,
-    description: "Luxuriously soft merino wool throw in a timeless neutral tone.",
-    inStock: false,
-  },
-];
 
 const Store = () => {
   const { data: products, isLoading, error } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
-      try {
         const result = await sanityClient.fetch<Product[]>(productsQuery);
-        return result.length > 0 ? result : mockProducts;
-      } catch {
-        return mockProducts;
-      }
+        if (result.length <= 0 )
+            console.log("Couldnt fetch any products.")
+        return result;
     },
   });
 
@@ -111,7 +70,8 @@ const Store = () => {
         <header className="mb-16">
           <h1 className="text-5xl md:text-6xl font-serif mb-4">Store</h1>
           <p className="text-xl text-muted-foreground max-w-2xl">
-            Carefully curated objects for thoughtful living.
+            Köp mina böcker!!!\n 
+            Bra pris bra pris.
           </p>
         </header>
 

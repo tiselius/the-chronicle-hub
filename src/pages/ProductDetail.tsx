@@ -14,17 +14,6 @@ const formatPrice = (price: number) => {
   }).format(price);
 };
 
-// Mock product for development
-const mockProduct: Product = {
-  _id: "1",
-  _createdAt: "2024-01-15",
-  name: "Minimal Desk Lamp",
-  slug: { current: "minimal-desk-lamp" },
-  price: 145,
-  description: "A beautifully crafted desk lamp with clean lines and warm ambient lighting. Made from solid brass with a brushed finish, this lamp brings both function and elegance to any workspace. The adjustable arm allows for precise positioning, while the weighted base ensures stability.",
-  inStock: true,
-};
-
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const { addToCart } = useCart();
@@ -32,12 +21,8 @@ const ProductDetail = () => {
   const { data: product, isLoading, error } = useQuery({
     queryKey: ["product", slug],
     queryFn: async () => {
-      try {
         const result = await sanityClient.fetch<Product>(productBySlugQuery, { slug });
-        return result || mockProduct;
-      } catch {
-        return mockProduct;
-      }
+        return result;
     },
   });
 
@@ -138,7 +123,7 @@ const ProductDetail = () => {
                   className="w-full md:w-auto"
                 >
                   <ShoppingBag className="w-4 h-4 mr-2" />
-                  Add to Cart
+                  Lägg i varukorgen
                 </Button>
               )}
             </div>
