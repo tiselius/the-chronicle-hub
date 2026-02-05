@@ -105,7 +105,7 @@ const ProductDetail = () => {
               <div className="flex flex-wrap gap-2">
                 {product.categories.map((category) => (
                   <Badge key={category._id} variant="secondary" className="text-sm">
-                    {category.name || category.title || 'Category'}
+                    {category.title}
                   </Badge>
                 ))}
               </div>
