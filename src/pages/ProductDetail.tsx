@@ -4,7 +4,7 @@ import Layout from "@/components/layout/Layout";
 import { sanityClient, productBySlugQuery, urlFor, Product } from "@/lib/sanity";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+
 import { ArrowLeft, ShoppingBag } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import ProductImageGallery from "@/components/store/ProductImageGallery";
@@ -104,9 +104,13 @@ const ProductDetail = () => {
             {product.categories && product.categories.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {product.categories.map((category) => (
-                  <Badge key={category._id} variant="secondary" className="text-sm">
+                  <Link
+                    key={category._id}
+                    to={`/store?category=${category.slug.current}`}
+                    className="inline-flex items-center rounded-full border border-transparent bg-secondary text-secondary-foreground px-2.5 py-0.5 text-sm font-semibold transition-colors hover:bg-secondary/80"
+                  >
                     {category.title}
-                  </Badge>
+                  </Link>
                 ))}
               </div>
             )}

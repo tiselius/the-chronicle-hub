@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import { sanityClient, productsQuery, urlFor, Product } from "@/lib/sanity";
+import { sanityClient, productsQuery, productsByCategoryQuery, categoryBySlugQuery, urlFor, Product, Category } from "@/lib/sanity";
 import { Skeleton } from "@/components/ui/skeleton";
-
+import { X } from "lucide-react";
 
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat("en-US", {
@@ -53,15 +53,31 @@ const ProductSkeleton = () => (
   </div>
 );
 
-
 const Store = () => {
-  const { data: products, isLoading, error } = useQuery({
-    queryKey: ["products"],
+  const [searchParams] = useSearchParams();
+  const categorySlug = searchParams.get("category");
+
+  const { data: category } = useQuery({
+    queryKey: ["category", categorySlug],
     queryFn: async () => {
-        const result = await sanityClient.fetch<Product[]>(productsQuery);
-        if (result.length <= 0 )
-            console.log("Couldnt fetch any products.")
+      if (!categorySlug) return null;
+      const result = await sanityClient.fetch<Category & { description?: string }>(categoryBySlugQuery, { slug: categorySlug });
+      return result;
+    },
+    enabled: !!categorySlug,
+  });
+
+  const { data: products, isLoading, error } = useQuery({
+    queryKey: ["products", categorySlug],
+    queryFn: async () => {
+      if (categorySlug) {
+        const result = await sanityClient.fetch<Product[]>(productsByCategoryQuery, { categorySlug });
         return result;
+      }
+      const result = await sanityClient.fetch<Product[]>(productsQuery);
+      if (result.length <= 0)
+        console.log("Couldnt fetch any products.");
+      return result;
     },
   });
 
@@ -69,10 +85,22 @@ const Store = () => {
     <Layout>
       <section className="container-wide py-16">
         <header className="mb-16">
-          <h1 className="text-5xl md:text-6xl font-serif mb-4">Store</h1>
+          <div className="flex items-center gap-4 mb-4">
+            <h1 className="text-5xl md:text-6xl font-serif">
+              {category ? category.title : "Store"}
+            </h1>
+            {category && (
+              <Link
+                to="/store"
+                className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="w-4 h-4" />
+                Rensa filter
+              </Link>
+            )}
+          </div>
           <p className="text-xl text-muted-foreground max-w-2xl">
-            Köp mina böcker!!!\n 
-            Bra pris bra pris.
+            {category?.description || "Köp mina böcker!!!\nBra pris bra pris."}
           </p>
         </header>
 
@@ -84,12 +112,14 @@ const Store = () => {
           </div>
         ) : error ? (
           <p className="text-muted-foreground">Unable to load products.</p>
-        ) : (
+        ) : products && products.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {products?.map((product) => (
+            {products.map((product) => (
               <ProductCard key={product._id} product={product} />
             ))}
           </div>
+        ) : (
+          <p className="text-muted-foreground">Inga produkter i denna kategori.</p>
         )}
       </section>
     </Layout>

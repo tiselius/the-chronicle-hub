@@ -99,6 +99,26 @@ export const productsQuery = `*[_type == "product"] | order(_createdAt desc) {
   inStock
 }`;
 
+export const productsByCategoryQuery = `*[_type == "product" && $categorySlug in categories[]->slug.current] | order(_createdAt desc) {
+  _id,
+  _createdAt,
+  name,
+  slug,
+  price,
+  description,
+  mainImage,
+  images,
+  "categories": categories[]->{ _id, title, slug },
+  inStock
+}`;
+
+export const categoryBySlugQuery = `*[_type == "category" && slug.current == $slug][0] {
+  _id,
+  title,
+  slug,
+  description
+}`;
+
 export const productBySlugQuery = `*[_type == "product" && slug.current == $slug][0] {
   _id,
   _createdAt,
