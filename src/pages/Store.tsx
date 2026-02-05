@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { sanityClient, productsQuery, urlFor, Product } from "@/lib/sanity";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
+
 
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat("en-US", {
@@ -17,10 +17,10 @@ const ProductCard = ({ product }: { product: Product }) => {
     <article className="group">
       <Link to={`/store/${product.slug.current}`} className="block hover:no-underline">
         <div className="aspect-square overflow-hidden mb-4 bg-secondary">
-          {product.mainImage ? (
+          {product.images && product.images.length > 0 ? (
             <img
-              src={urlFor(product.mainImage)}
-              alt={product.mainImage.alt || product.name}
+              src={urlFor(product.images[0])}
+              alt={product.images[0].alt || product.name}
               className="w-full h-full object-cover"
             />
           ) : (
@@ -36,15 +36,6 @@ const ProductCard = ({ product }: { product: Product }) => {
           <p className="text-muted-foreground font-sans">
             {formatPrice(product.price)}
           </p>
-          {product.categories && product.categories.length > 0 && (
-            <div className="flex flex-wrap gap-1 pt-1">
-              {product.categories.map((category) => (
-                <Badge key={category._id} variant="secondary" className="text-xs font-sans">
-                  {category.name}
-                </Badge>
-              ))}
-            </div>
-          )}
           {product.inStock === false && (
             <p className="text-sm text-muted-foreground">Out of stock</p>
           )}

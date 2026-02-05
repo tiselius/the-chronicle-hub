@@ -34,6 +34,7 @@ export interface SanityImageSource {
 export interface Category {
   _id: string;
   name: string;
+  title?: string;
   slug: { current: string };
 }
 
