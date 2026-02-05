@@ -31,6 +31,12 @@ export interface SanityImageSource {
   alt?: string;
 }
 
+export interface Category {
+  _id: string;
+  name: string;
+  slug: { current: string };
+}
+
 export interface Article {
   _id: string;
   _createdAt: string;
@@ -52,6 +58,7 @@ export interface Product {
   description?: string;
   mainImage?: SanityImageSource;
   images?: SanityImageSource[];
+  categories?: Category[];
   inStock?: boolean;
 }
 
@@ -87,6 +94,8 @@ export const productsQuery = `*[_type == "product"] | order(_createdAt desc) {
   price,
   description,
   mainImage,
+  images,
+  "categories": categories[]->{ _id, name, slug },
   inStock
 }`;
 
@@ -99,5 +108,6 @@ export const productBySlugQuery = `*[_type == "product" && slug.current == $slug
   description,
   mainImage,
   images,
+  "categories": categories[]->{ _id, name, slug },
   inStock
 }`;

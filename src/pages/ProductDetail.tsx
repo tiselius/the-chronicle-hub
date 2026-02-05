@@ -4,8 +4,10 @@ import Layout from "@/components/layout/Layout";
 import { sanityClient, productBySlugQuery, urlFor, Product } from "@/lib/sanity";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ShoppingBag } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
+import ProductImageGallery from "@/components/store/ProductImageGallery";
 
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat("en-US", {
@@ -84,20 +86,11 @@ const ProductDetail = () => {
         </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Product Image */}
-          <div className="aspect-square bg-secondary">
-            {product.mainImage ? (
-              <img
-                src={urlFor(product.mainImage)}
-                alt={product.mainImage.alt || product.name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                No image
-              </div>
-            )}
-          </div>
+          {/* Product Images */}
+          <ProductImageGallery
+            images={product.images || (product.mainImage ? [product.mainImage] : [])}
+            productName={product.name}
+          />
 
           {/* Product Info */}
           <div className="space-y-6">
@@ -107,6 +100,16 @@ const ProductDetail = () => {
                 {formatPrice(product.price)}
               </p>
             </div>
+
+            {product.categories && product.categories.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {product.categories.map((category) => (
+                  <Badge key={category._id} variant="secondary">
+                    {category.name}
+                  </Badge>
+                ))}
+              </div>
+            )}
 
             {product.description && (
               <p className="text-muted-foreground leading-relaxed">
