@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { useCart, CartItem } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
-import { Trash2, ArrowLeft, ShoppingBag } from "lucide-react";
+import { Trash2, ArrowLeft, ShoppingBag, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat("sv-SE", {
@@ -58,6 +61,34 @@ const CartItemRow = ({ item }: { item: CartItem }) => {
 
 const Cart = () => {
   const { items, getTotalPrice, clearCart } = useCart();
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+
+  const handleCheckout = async () => {
+    setIsCheckingOut(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { items },
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("No checkout URL returned");
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      toast({
+        title: "Något gick fel",
+        description: "Kunde inte starta kassan. Försök igen.",
+        variant: "destructive",
+      });
+      setIsCheckingOut(false);
+    }
+  };
 
   if (items.length === 0) {
     return (
@@ -126,8 +157,20 @@ const Cart = () => {
                 <span>{formatPrice(getTotalPrice())}</span>
               </div>
 
-              <Button className="w-full" size="lg">
-                Fortsätt till kassan
+              <Button 
+                className="w-full" 
+                size="lg" 
+                onClick={handleCheckout}
+                disabled={isCheckingOut}
+              >
+                {isCheckingOut ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Laddar...
+                  </>
+                ) : (
+                  "Fortsätt till kassan"
+                )}
               </Button>
               {/* 
                   <p className="text-xs text-muted-foreground text-center mt-4">
