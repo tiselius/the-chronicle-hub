@@ -10,9 +10,9 @@ import { useCart } from "@/hooks/useCart";
 import ProductImageGallery from "@/components/store/ProductImageGallery";
 
 const formatPrice = (price: number) => {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("sv-SE", {
     style: "currency",
-    currency: "USD",
+    currency: "SEK",
   }).format(price);
 };
 
@@ -36,7 +36,7 @@ const ProductDetail = () => {
         id: product._id,
         name: product.name,
         price: product.price,
-        image: product.mainImage ? urlFor(product.mainImage) : undefined,
+        image: product.images.length > 0 ? urlFor(product.images[0]) : undefined,
         quantity: 1,
       });
     }

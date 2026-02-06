@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Trash2, ArrowLeft, ShoppingBag } from "lucide-react";
 
 const formatPrice = (price: number) => {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("sv-SE", {
     style: "currency",
-    currency: "USD",
+    currency: "SEK",
   }).format(price);
 };
 
@@ -63,12 +63,12 @@ const Cart = () => {
     return (
       <Layout>
         <div className="container-editorial py-16">
-          <h1 className="text-4xl md:text-5xl font-serif mb-8">Cart</h1>
+          <h1 className="text-4xl md:text-5xl font-serif mb-8">Varukorg</h1>
           <div className="text-center py-16">
             <ShoppingBag className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-            <p className="text-xl text-muted-foreground mb-6">Your cart is empty</p>
+            <p className="text-xl text-muted-foreground mb-6">Din varukorg är tom</p>
             <Link to="/store">
-              <Button>Continue Shopping</Button>
+              <Button>Tillbaka till bokaffären</Button>
             </Link>
           </div>
         </div>
@@ -87,7 +87,7 @@ const Cart = () => {
           Continue Shopping
         </Link>
 
-        <h1 className="text-4xl md:text-5xl font-serif mb-8">Cart</h1>
+        <h1 className="text-4xl md:text-5xl font-serif mb-8">Varukorg</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Cart Items */}
@@ -101,23 +101,23 @@ const Cart = () => {
               onClick={clearCart}
               className="text-sm text-muted-foreground hover:text-foreground mt-4"
             >
-              Clear cart
+              Töm varukorgen
             </button>
           </div>
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
             <div className="bg-secondary p-6 sticky top-24">
-              <h2 className="font-sans font-medium text-lg mb-4">Order Summary</h2>
+              <h2 className="font-sans font-medium text-lg mb-4">Ordersammanfattning</h2>
               
               <div className="space-y-2 text-sm border-b border-border pb-4 mb-4">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="text-muted-foreground">Delsumma</span>
                   <span>{formatPrice(getTotalPrice())}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span className="text-muted-foreground">Calculated at checkout</span>
+                  <span className="text-muted-foreground">Frakt</span>
+                  <span className="text-muted-foreground">Beräknas vid kassan</span>
                 </div>
               </div>
 
@@ -127,12 +127,13 @@ const Cart = () => {
               </div>
 
               <Button className="w-full" size="lg">
-                Proceed to Checkout
+                Fortsätt till kassan
               </Button>
-
-              <p className="text-xs text-muted-foreground text-center mt-4">
-                Shipping and taxes calculated at checkout
-              </p>
+              {/* 
+                  <p className="text-xs text-muted-foreground text-center mt-4">
+                 Shipping and taxes calculated at checkout
+               </p>
+               */}
             </div>
           </div>
         </div>

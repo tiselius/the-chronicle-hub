@@ -6,9 +6,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { X } from "lucide-react";
 
 const formatPrice = (price: number) => {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("sv-SE", {
     style: "currency",
-    currency: "USD",
+    currency: "SEK",
   }).format(price);
 };
 
@@ -36,9 +36,9 @@ const ProductCard = ({ product }: { product: Product }) => {
           <p className="text-muted-foreground font-sans">
             {formatPrice(product.price)}
           </p>
-          {product.inStock === false && (
-            <p className="text-sm text-muted-foreground">Out of stock</p>
-          )}
+          {/* {product.inStock === false && ( */}
+          {/*   <p className="text-sm text-muted-foreground">Out of stock</p> */}
+          {/* )} */}
         </div>
       </Link>
     </article>
@@ -87,7 +87,7 @@ const Store = () => {
         <header className="mb-16">
           <div className="flex items-center gap-4 mb-4">
             <h1 className="text-5xl md:text-6xl font-serif">
-              {category ? category.title : "Store"}
+              {category ? category.title : "Bokaffären"}
             </h1>
             {category && (
               <Link
@@ -100,7 +100,7 @@ const Store = () => {
             )}
           </div>
           <p className="text-xl text-muted-foreground max-w-2xl">
-            {category?.description || "Köp mina böcker!!!\nBra pris bra pris."}
+            {category ?.description || "Köp mina böcker!!! Bra pris bra pris."}
           </p>
         </header>
 

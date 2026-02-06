@@ -15,7 +15,7 @@ const Layout = ({ children }: LayoutProps) => {
       <footer className="border-t border-border mt-24">
         <div className="container-wide py-12">
           <p className="text-sm text-muted-foreground text-center">
-            © {new Date().getFullYear()} Editorial. All rights reserved.
+            © {new Date().getFullYear()} Böcker. All rights reserved.
           </p>
         </div>
       </footer>

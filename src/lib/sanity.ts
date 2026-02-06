@@ -86,7 +86,8 @@ export const articleBySlugQuery = `*[_type == "article" && slug.current == $slug
   body
 }`;
 
-export const productsQuery = `*[_type == "product"] | order(_createdAt desc) {
+// export const productsQuery = `*[_type == "product"] | order(_createdAt desc) {
+export const productsQuery = `*[_type == "product" && inStock == true] | order(_createdAt desc) {
   _id,
   _createdAt,
   name,
@@ -99,7 +100,7 @@ export const productsQuery = `*[_type == "product"] | order(_createdAt desc) {
   inStock
 }`;
 
-export const productsByCategoryQuery = `*[_type == "product" && $categorySlug in categories[]->slug.current] | order(_createdAt desc) {
+export const productsByCategoryQuery = `*[_type == "product" && $categorySlug in categories[]->slug.current && inStock == true] | order(_createdAt desc) {
   _id,
   _createdAt,
   name,
@@ -119,6 +120,7 @@ export const categoryBySlugQuery = `*[_type == "category" && slug.current == $sl
   description
 }`;
 
+// export const productBySlugQuery = `*[_type == "product" && slug.current == $slug][0] {
 export const productBySlugQuery = `*[_type == "product" && slug.current == $slug][0] {
   _id,
   _createdAt,
