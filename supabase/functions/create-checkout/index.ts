@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 interface CartItem {
-  id: string;
+  id: string; // Sanity product _id
   name: string;
   price: number;
   quantity: number;
@@ -56,6 +56,9 @@ serve(async (req) => {
 
     const origin = req.headers.get("origin") || "http://localhost:8080";
 
+    // Store Sanity product IDs in metadata for webhook to update stock
+    const productIds = items.map((item) => item.id).join(",");
+
     // Create checkout session for one-time payment (physical products)
     const session = await stripe.checkout.sessions.create({
       line_items: lineItems,
@@ -66,6 +69,9 @@ serve(async (req) => {
         allowed_countries: ["SE", "NO", "DK", "FI"], // Nordic countries
       },
       billing_address_collection: "required",
+      metadata: {
+        sanity_product_ids: productIds,
+      },
     });
 
     return new Response(JSON.stringify({ url: session.url }), {
