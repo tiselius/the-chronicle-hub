@@ -71,6 +71,7 @@ const Cart = () => {
       }
       if (data?.url) {
         window.open(data.url, "_blank");
+        setIsCheckingOut(false);
       } else {
         throw new Error("No checkout URL returned");
       }
