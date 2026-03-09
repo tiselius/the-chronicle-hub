@@ -34,7 +34,13 @@ serve(async (req) => {
     const signature = req.headers.get("stripe-signature");
     if (!signature) throw new Error("No stripe-signature header");
 
-    const event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    const event = await stripe.webhooks.constructEventAsync(
+      body,
+      signature,
+      webhookSecret,
+      undefined,
+      Stripe.createSubtleCryptoProvider()
+    );
     logStep("Event received", { type: event.type, id: event.id });
 
     if (event.type === "checkout.session.completed") {
