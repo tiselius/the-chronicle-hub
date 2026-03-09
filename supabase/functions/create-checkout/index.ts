@@ -107,7 +107,7 @@ serve(async (req) => {
       },
       billing_address_collection: "required",
       metadata: {
-        sanity_product_ids: productIds,
+        sanity_product_ids: metaProductIds,
       },
     });
 
