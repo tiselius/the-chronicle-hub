@@ -44,8 +44,8 @@ serve(async (req) => {
     const query = encodeURIComponent(
       `*[_type == "product" && _id in $ids]{ _id, name, price, inStock }`
     );
-    const params = encodeURIComponent(JSON.stringify({ ids: productIds }));
-    const sanityUrl = `https://${sanityProjectId}.api.sanity.io/v2024-01-01/data/query/${sanityDataset}?query=${query}&$ids=${params}`;
+    const idsParam = encodeURIComponent(JSON.stringify(productIds));
+    const sanityUrl = `https://${sanityProjectId}.api.sanity.io/v2024-01-01/data/query/${sanityDataset}?query=${query}&$ids=${idsParam}`;
 
     const sanityResponse = await fetch(sanityUrl);
     if (!sanityResponse.ok) {
