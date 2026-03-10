@@ -63,13 +63,21 @@ const Cart = () => {
         body: { items }
       });
 
-      // supabase.functions.invoke may return error in data.error or in error
-      const errorMessage = data?.error || error?.message || "";
+      // Extract error message: check data.error first, then try to read body from FunctionsHttpError
+      let errorMessage = data?.error || "";
+      if (!errorMessage && error) {
+        try {
+          // FunctionsHttpError stores the response in error.context
+          const errorBody = await error.context?.json?.();
+          errorMessage = errorBody?.error || error.message || "";
+        } catch {
+          errorMessage = error.message || "";
+        }
+      }
 
       if (errorMessage) {
         console.error("Checkout error:", errorMessage);
 
-        // Check for out-of-stock errors
         if (errorMessage.includes("no longer in stock")) {
           const nameMatch = errorMessage.match(/"([^"]+)"/);
           const itemName = nameMatch?.[1];
