@@ -52,23 +52,67 @@ const Cart = () => {
   const {
     items,
     getTotalPrice,
-    clearCart
+    clearCart,
+    removeFromCart
   } = useCart();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const handleCheckout = async () => {
     setIsCheckingOut(true);
     try {
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke("create-checkout", {
-        body: {
-          items
-        }
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { items }
       });
-      if (error) {
-        throw new Error(error.message);
+
+      // Extract error message: check data.error first, then try to read body from FunctionsHttpError
+      let errorMessage = data?.error || "";
+      if (!errorMessage && error) {
+        try {
+          // FunctionsHttpError stores the response in error.context
+          const errorBody = await error.context?.json?.();
+          errorMessage = errorBody?.error || error.message || "";
+        } catch {
+          errorMessage = error.message || "";
+        }
       }
+
+      if (errorMessage) {
+        console.error("Checkout error:", errorMessage);
+
+        if (errorMessage.includes("no longer in stock")) {
+          const nameMatch = errorMessage.match(/"([^"]+)"/);
+          const itemName = nameMatch?.[1];
+          if (itemName) {
+            const itemToRemove = items.find(i => i.name === itemName);
+            if (itemToRemove) removeFromCart(itemToRemove.id);
+          }
+          toast({
+            title: itemName ? `"${itemName}" är inte längre i lager` : "Produkten är slutsåld",
+            description: "Produkten har tagits bort från din varukorg.",
+            variant: "destructive",
+          });
+        } else if (errorMessage.includes("Price mismatch")) {
+          toast({
+            title: "Priset har ändrats",
+            description: "Vänligen ladda om sidan och försök igen.",
+            variant: "destructive",
+          });
+        } else if (errorMessage.includes("not found")) {
+          toast({
+            title: "Produkten hittades inte",
+            description: "En produkt i din varukorg finns inte längre.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Något gick fel",
+            description: "Kunde inte starta kassan. Försök igen.",
+            variant: "destructive",
+          });
+        }
+        setIsCheckingOut(false);
+        return;
+      }
+
       if (data?.url) {
         window.open(data.url, "_blank");
         setIsCheckingOut(false);
@@ -80,7 +124,7 @@ const Cart = () => {
       toast({
         title: "Något gick fel",
         description: "Kunde inte starta kassan. Försök igen.",
-        variant: "destructive"
+        variant: "destructive",
       });
       setIsCheckingOut(false);
     }
