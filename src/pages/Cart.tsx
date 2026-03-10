@@ -59,65 +59,63 @@ const Cart = () => {
   const handleCheckout = async () => {
     setIsCheckingOut(true);
     try {
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke("create-checkout", {
-        body: {
-          items
-        }
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { items }
       });
-      if (error) {
-        throw new Error(error.message);
+
+      // supabase.functions.invoke may return error in data.error or in error
+      const errorMessage = data?.error || error?.message || "";
+
+      if (errorMessage) {
+        console.error("Checkout error:", errorMessage);
+
+        // Check for out-of-stock errors
+        if (errorMessage.includes("no longer in stock")) {
+          const nameMatch = errorMessage.match(/"([^"]+)"/);
+          const itemName = nameMatch?.[1];
+          if (itemName) {
+            const itemToRemove = items.find(i => i.name === itemName);
+            if (itemToRemove) removeFromCart(itemToRemove.id);
+          }
+          toast({
+            title: itemName ? `"${itemName}" är inte längre i lager` : "Produkten är slutsåld",
+            description: "Produkten har tagits bort från din varukorg.",
+            variant: "destructive",
+          });
+        } else if (errorMessage.includes("Price mismatch")) {
+          toast({
+            title: "Priset har ändrats",
+            description: "Vänligen ladda om sidan och försök igen.",
+            variant: "destructive",
+          });
+        } else if (errorMessage.includes("not found")) {
+          toast({
+            title: "Produkten hittades inte",
+            description: "En produkt i din varukorg finns inte längre.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Något gick fel",
+            description: "Kunde inte starta kassan. Försök igen.",
+            variant: "destructive",
+          });
+        }
+        setIsCheckingOut(false);
+        return;
       }
+
       if (data?.url) {
         window.open(data.url, "_blank");
         setIsCheckingOut(false);
       } else {
         throw new Error("No checkout URL returned");
       }
-    } catch (error: any) {
-      const errorMsg = error?.message || "";
-      console.error("Checkout error:", errorMsg);
-
-      // Parse the edge function error body if present
-      let userMessage = "Kunde inte starta kassan. Försök igen.";
-      let shouldRemoveItem = false;
-      let itemName = "";
-
-      // Edge function returns JSON with { error: "message" }
-      // The supabase client wraps it; try to extract the inner message
-      try {
-        const parsed = JSON.parse(errorMsg.replace(/^Edge function returned \d+: Error, /, ""));
-        if (parsed?.error) {
-          userMessage = parsed.error;
-        }
-      } catch {
-        // Try direct match from context field
-        if (errorMsg.includes("no longer in stock")) {
-          userMessage = errorMsg;
-        }
-      }
-
-      // Auto-remove out-of-stock items from cart
-      if (userMessage.includes("no longer in stock") || userMessage.includes("inte i lager")) {
-        // Extract product name from message like '"Bibeln" is no longer in stock'
-        const nameMatch = userMessage.match(/"([^"]+)"/);
-        if (nameMatch) {
-          itemName = nameMatch[1];
-          const itemToRemove = items.find(i => i.name === itemName);
-          if (itemToRemove) {
-            removeFromCart(itemToRemove.id);
-            shouldRemoveItem = true;
-          }
-        }
-      }
-
+    } catch (error) {
+      console.error("Checkout error:", error);
       toast({
-        title: shouldRemoveItem ? `"${itemName}" är inte längre i lager` : "Något gick fel",
-        description: shouldRemoveItem
-          ? "Produkten har tagits bort från din varukorg."
-          : userMessage,
+        title: "Något gick fel",
+        description: "Kunde inte starta kassan. Försök igen.",
         variant: "destructive",
       });
       setIsCheckingOut(false);
