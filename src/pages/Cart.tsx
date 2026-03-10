@@ -52,7 +52,8 @@ const Cart = () => {
   const {
     items,
     getTotalPrice,
-    clearCart
+    clearCart,
+    removeFromCart
   } = useCart();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const handleCheckout = async () => {
@@ -75,12 +76,49 @@ const Cart = () => {
       } else {
         throw new Error("No checkout URL returned");
       }
-    } catch (error) {
-      console.error("Checkout error:", error);
+    } catch (error: any) {
+      const errorMsg = error?.message || "";
+      console.error("Checkout error:", errorMsg);
+
+      // Parse the edge function error body if present
+      let userMessage = "Kunde inte starta kassan. Försök igen.";
+      let shouldRemoveItem = false;
+      let itemName = "";
+
+      // Edge function returns JSON with { error: "message" }
+      // The supabase client wraps it; try to extract the inner message
+      try {
+        const parsed = JSON.parse(errorMsg.replace(/^Edge function returned \d+: Error, /, ""));
+        if (parsed?.error) {
+          userMessage = parsed.error;
+        }
+      } catch {
+        // Try direct match from context field
+        if (errorMsg.includes("no longer in stock")) {
+          userMessage = errorMsg;
+        }
+      }
+
+      // Auto-remove out-of-stock items from cart
+      if (userMessage.includes("no longer in stock") || userMessage.includes("inte i lager")) {
+        // Extract product name from message like '"Bibeln" is no longer in stock'
+        const nameMatch = userMessage.match(/"([^"]+)"/);
+        if (nameMatch) {
+          itemName = nameMatch[1];
+          const itemToRemove = items.find(i => i.name === itemName);
+          if (itemToRemove) {
+            removeFromCart(itemToRemove.id);
+            shouldRemoveItem = true;
+          }
+        }
+      }
+
       toast({
-        title: "Något gick fel",
-        description: "Kunde inte starta kassan. Försök igen.",
-        variant: "destructive"
+        title: shouldRemoveItem ? `"${itemName}" är inte längre i lager` : "Något gick fel",
+        description: shouldRemoveItem
+          ? "Produkten har tagits bort från din varukorg."
+          : userMessage,
+        variant: "destructive",
       });
       setIsCheckingOut(false);
     }
