@@ -52,7 +52,8 @@ const Cart = () => {
   const {
     items,
     getTotalPrice,
-    clearCart
+    clearCart,
+    removeFromCart
   } = useCart();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const handleCheckout = async () => {
