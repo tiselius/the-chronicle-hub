@@ -128,7 +128,7 @@ const ProductDetail = () => {
                 </Button>
               ) : inCart ? (
                 <Button disabled variant="secondary" className="w-full md:w-auto">
-                  Redan i varukorgen
+                  Tillagd i varukorgen
                 </Button>
               ) : (
                 <Button 
