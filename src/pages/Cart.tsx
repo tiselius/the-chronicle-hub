@@ -121,7 +121,6 @@ const Cart = () => {
       setIsCheckingOut(false);
     }
   };
-  };
   if (items.length === 0) {
     return <Layout>
         <div className="container-editorial py-16">
